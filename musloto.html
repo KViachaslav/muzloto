@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@700&display=swap" rel="stylesheet">
+    <title>Музлото</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-family: Arial, sans-serif;
+            background: url('images/background.png') no-repeat center center fixed;
+            background-size: cover;
+            margin: 0;
+            padding: 20px;
+            position: relative;
+            filter: brightness(0.8);
+        }
+        .title {
+            margin: 3px 0;
+        }
+        .title img {
+            line-height: 0,8; /* Уменьшение межстрочного интервала */
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(9, 150px);
+            grid-gap: 10px; /* Расстояние между шариками */
+            margin: 5px 0;
+            width: 100%;
+            max-width: 1400px;
+        }
+        .cell {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 120px; /* Высота ячейки */
+            position: relative;
+        }
+        .cell img {
+            max-width: 95%; /* Размер шариков */
+            max-height: 95%;
+        }
+        .number {
+            position: absolute;
+            color: #FFFF40; /* Яркий желтый цвет */
+            font-size: 40px; /* Размер шрифта */
+            font-weight: bold;
+            font-family: 'Roboto', sans-serif; /* Красивый шрифт */
+	    margin-top: 13px; /* Увеличьте значение, чтобы опустить номер */
+        }
+        .occupied .number {
+            color: black; /* Цвет текста для занятой ячейки */
+        }
+	.disabled img {
+            filter: grayscale(100%); /* Затемнение изображения до серого цвета */
+        }
+        #resetButton {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            padding: 5px;
+            font-size: 18px;
+            background-color: transparent;
+            border: none;
+            cursor: pointer;
+            color: #FF6347;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="title">
+        <img src="https://x-lines.ru/letters/i/cyrillicfancy/0301/d11521/44/0/4nqpbe6o19ejzwr64ntpb8o.png" alt="Музлото">
+    </div>
+    <div class="grid" id="grid"></div>
+    <button id="resetButton">🔄</button>
+    <audio id="audio" src="" preload="auto"></audio>
+    
+    <script>
+        const gridElement = document.getElementById('grid');
+        const resetButton = document.getElementById('resetButton');
+        const audio = document.getElementById('audio');
+
+        const songs = Array.from({length: 45}, (_, i) => `songs/song_${i + 1}.mp3`);
+        const cells = 45;
+
+        function createGrid() {
+            gridElement.innerHTML = '';
+            for (let i = 0; i < cells; i++) {
+                const cell = document.createElement('div');
+                cell.className = 'cell';
+                const img = document.createElement('img');
+                img.src = 'images/ball.png'; // Путь к изображению шарика
+                img.alt = `Шарик ${i + 1}`;
+                cell.appendChild(img);
+                
+                const number = document.createElement('div');
+                number.className = 'number';
+                number.textContent = i + 1;
+                number.style.color = (i % 2 === 0) ? '#FFFF40' : '#3BDA00'; 
+                
+                cell.appendChild(number);
+                cell.addEventListener('click', () => playSong(i));
+                gridElement.appendChild(cell);
+            }
+        }
+
+        function playSong(index) {
+            const songSrc = songs[index];
+            audio.src = songSrc;
+            audio.play();
+            audio.currentTime = 0; 
+            
+            const cell = gridElement.children[index];
+	    const img = cell.querySelector('img'); 
+
+		audio.addEventListener('ended', () => {
+        	img.src = 'images/ball_end.png'; // Путь к изображению окончательного состояния шарика
+                cell.classList.add('disabled');
+    		});
+
+          
+            
+        }
+
+        resetButton.addEventListener('click', () => {
+            createGrid();
+            audio.pause();
+            audio.currentTime = 0; 
+        });
+
+        createGrid(); 
+    </script>
+</body>
+</html>
